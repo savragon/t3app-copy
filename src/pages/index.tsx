@@ -49,8 +49,11 @@ export default function Home() {
         condition.text.includes("Rain") ||
         condition.text.includes("Snow")
       ) {
-        points -= 2; // Corrected from points -= 4 to points -= 2
+        points -= 2;
         console.log("Points Deducted from Rain/Snow:", -2);
+      } else if (condition.text.includes("Cloud")) {
+        points += 2;
+        console.log("Points from Partially Cloudy Weather:", 2);
       }
 
       // Check if it's very warm or hot
@@ -73,54 +76,63 @@ export default function Home() {
     }
   };
 
-  const fetchData = () => {
+  const fetchData = async () => {
     if (cityName) {
-      // Fetch current weather data from OpenWeatherMap API
-      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${YOUR_API_KEY}&units=metric`;
+      const apiKey = "3c0328747012edae286e57d70ce918c5";
+      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
 
-      axios
-        .get(currentWeatherUrl)
-        .then((response) => {
-          setWeather(response.data);
+      try {
+        const response = await fetch(currentWeatherUrl);
+        if (response.ok) {
+          const weatherData = await response.json();
+          setWeather(weatherData);
 
-          const points = calculatePoints(response.data);
+          const points = calculatePoints(weatherData);
           console.log("Points Given:", points); // Log the points given
           const criteria = updatePerformanceCriteria(points);
           setPerformanceCriteria(criteria);
-        })
-        .catch((error) => {
-          console.error("Error fetching current weather data:", error);
-        });
+        } else {
+          console.error(
+            "Error fetching current weather data:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching current weather data:", error);
+      }
 
       // Fetch 5-day weather forecast from OpenWeatherMap API
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${YOUR_API_KEY}&units=metric`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`;
 
-      axios
-        .get(forecastUrl)
-        .then((response) => {
-          const forecastDays = response.data.list
-            .slice(0, 5) // Get the next 5 days
+      try {
+        const response = await fetch(forecastUrl);
+        if (response.ok) {
+          const forecastData = await response.json();
+          const forecastDays = forecastData.list
+            .slice(0, 5)
             .map((dayData: any) => ({
               date: dayData.dt_txt,
               day: {
-                is_day: 1, // Assuming it's day time for simplicity
                 condition: { text: dayData.weather[0].description },
                 temp_c: dayData.main.temp,
               },
             }));
           setForecastData(forecastDays);
-        })
-        .catch((error) => {
-          console.error("Error fetching 5-day weather forecast data:", error);
-        });
+        } else {
+          console.error(
+            "Error fetching 5-day weather forecast data:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching 5-day weather forecast data:", error);
+      }
     }
   };
 
   useEffect(() => {
     fetchData();
   }, [cityName]);
-
-  const YOUR_API_KEY = "3c0328747012edae286e57d70ce918c5";
 
   return (
     <div className="bg-custom h-screen w-full bg-cover bg-center bg-no-repeat font-medium">
