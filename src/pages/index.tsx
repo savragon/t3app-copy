@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { FaBars } from "react-icons/fa";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import Main from "./main";
 
 export default function Home() {
   const [cityName, setCityName] = useState("");
   const [weather, setWeather] = useState<any | null>(null);
   const [performanceCriteria, setPerformanceCriteria] = useState<string>("");
   const [forecastData, setForecastData] = useState<any[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<
+    "home" | "feed" | "map" | "settings" | "profile"
+  >("home");
 
   const handleCityNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCityName(event.target.value);
@@ -42,7 +48,7 @@ export default function Home() {
 
         // Check if it's sunny the entire day
         if (is_day === 1) {
-          points += 1;
+          points += 2;
           console.log("Additional Points from Full-day Sunshine:", 1);
         }
       } else if (
@@ -79,7 +85,7 @@ export default function Home() {
   const fetchData = async () => {
     if (cityName) {
       const apiKey = "3c0328747012edae286e57d70ce918c5";
-      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+      const currentWeatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=3c0328747012edae286e57d70ce918c5&units=metric`;
 
       try {
         const response = await fetch(currentWeatherUrl);
@@ -102,7 +108,8 @@ export default function Home() {
       }
 
       // Fetch 5-day weather forecast from OpenWeatherMap API
-      const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=${apiKey}&units=metric`;
+      const forecastUrl = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=3c0328747012edae286e57d70ce918c5&units=metric
+      `;
 
       try {
         const response = await fetch(forecastUrl);
@@ -162,8 +169,8 @@ export default function Home() {
         </div>
       </div>
       <div className="grid grid-cols-2">
-        <div className="mx-10 rounded-md bg-white p-5 shadow-2xl">
-          <h1 className="mb-10 flex items-center justify-center text-2xl font-semibold">
+        <div className="mx-10 rounded-md bg-black bg-opacity-50 p-5 shadow-2xl">
+          <h1 className="col-span-2 mb-10 flex items-center justify-center text-2xl font-semibold text-white">
             CarCast For Today
           </h1>
           {/* Display the performance criteria for the current day */}
@@ -177,8 +184,8 @@ export default function Home() {
             <img src="/POOR.png" alt="Bad" className="mx-auto w-72" />
           )}
         </div>
-        <div className="mx-10 flex flex-col items-center rounded-md bg-white p-5 shadow-2xl">
-          <h1 className="mb-10 text-2xl font-semibold">
+        <div className="mx-10 rounded-md bg-black bg-opacity-50 p-5 shadow-2xl">
+          <h1 className="col-span-2 mb-10 flex items-center justify-center text-2xl font-semibold text-white">
             CarCast for the Next 5 Days
           </h1>
           <div className="flex justify-center">

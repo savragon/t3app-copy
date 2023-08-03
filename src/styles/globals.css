@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 .bg-custom {
-    background-image: url("/carcast.png");
+    background-image: url("/thewall.png");
     /* You can add other background properties like size, position, repeat, etc. here */
   }
